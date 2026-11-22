@@ -1,0 +1,149 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JARVIS AI</title>
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;background:#050b16;color:#00eaff;
+ font-family:Arial;text-align:center;padding:25px 15px;
+}
+h1{font-size:38px;letter-spacing:5px;margin-top:35px}
+.circle{
+ width:180px;height:180px;border:3px solid #00eaff;
+ border-radius:50%;margin:35px auto;
+ display:flex;align-items:center;justify-content:center;
+ box-shadow:0 0 25px #00eaff,inset 0 0 25px #00eaff;
+ font-size:65px;
+}
+button{
+ background:#00d9ff;color:#00121b;border:0;
+ padding:15px 25px;border-radius:30px;
+ font-size:17px;font-weight:bold;margin:10px;
+}
+#status{margin:20px;color:#fff}
+#output{
+ margin:20px auto;padding:18px;border:1px solid #00eaff;
+ border-radius:15px;min-height:100px;max-width:500px;
+ color:white;line-height:1.6;
+}
+input{
+ width:90%;padding:15px;border-radius:25px;
+ border:1px solid #00eaff;background:#101b2c;
+ color:white;font-size:16px;
+}
+</style>
+</head>
+<body>
+
+<h1>J.A.R.V.I.S</h1>
+<p>YOUR PERSONAL AI ASSISTANT</p>
+
+<div class="circle">◉</div>
+
+<div id="status">SYSTEM ONLINE</div>
+
+<button onclick="listen()">🎤 TALK TO JARVIS</button>
+
+<div>
+<input id="command" placeholder="Type your command here">
+<button onclick="send()">SEND</button>
+</div>
+
+<div id="output">Hello! I am JARVIS. How can I help you?</div>
+
+<script>
+const output=document.getElementById("output");
+const statusText=document.getElementById("status");
+
+function speak(text){
+ output.innerText=text;
+ const speech=new SpeechSynthesisUtterance(text);
+ speech.rate=0.85;
+ speech.pitch=0.65;
+ speech.volume=1;
+ speech.lang="en-US";
+ const voices=speechSynthesis.getVoices();
+ const voice=voices.find(v=>v.lang==="en-US" && /male/i.test(v.name));
+ if(voice) speech.voice=voice;
+ speechSynthesis.cancel();
+ speechSynthesis.speak(speech);
+}
+
+function listen(){
+ const Recognition=window.SpeechRecognition || window.webkitSpeechRecognition;
+ if(!Recognition){
+ speak("Voice recognition is not supported in this browser.");
+ return;
+ }
+ const recognition=new Recognition();
+ recognition.lang="en-US";
+ recognition.interimResults=false;
+ statusText.innerText="LISTENING...";
+ recognition.onresult=function(event){
+  const text=event.results[0][0].transcript;
+  document.getElementById("command").value=text;
+  processCommand(text);
+ };
+ recognition.onerror=function(){
+  statusText.innerText="TRY AGAIN";
+ };
+ recognition.onend=function(){
+  statusText.innerText="SYSTEM ONLINE";
+ };
+ recognition.start();
+}
+
+function send(){
+ const text=document.getElementById("command").value.trim();
+ if(text) processCommand(text);
+}
+
+function processCommand(text){
+ const cmd=text.toLowerCase();
+
+ if(cmd.includes("hello") || cmd.includes("hi")){
+ speak("Hello! I am JARVIS. Ready to assist you.");
+ }
+ else if(cmd.includes("your name")){
+ speak("My name is JARVIS, your personal assistant.");
+ }
+ else if(cmd.includes("time")){
+ speak("The current time is "+new Date().toLocaleTimeString());
+ }
+ else if(cmd.includes("date")){
+ speak("Today's date is "+new Date().toDateString());
+ }
+ else if(cmd.includes("open youtube")){
+ speak("Opening YouTube.");
+ window.open("https://www.youtube.com","_blank");
+ }
+ else if(cmd.includes("open google")){
+ speak("Opening Google.");
+ window.open("https://www.google.com","_blank");
+ }
+ else if(cmd.includes("open whatsapp")){
+ speak("Opening WhatsApp.");
+ window.open("https://web.whatsapp.com","_blank");
+ }
+ else if(cmd.startsWith("search")){
+ const query=text.replace(/search/i,"").trim();
+ speak("Searching Google for "+query);
+ window.open("https://www.google.com/search?q="+encodeURIComponent(query),"_blank");
+ }
+ else if(cmd.includes("how are you")){
+ speak("I am functioning perfectly. Thank you.");
+ }
+ else if(cmd.includes("thank")){
+ speak("You are welcome. Always ready to assist.");
+ }
+ else{
+ speak("I heard you say "+text+". I do not know that command yet.");
+ }
+}
+</script>
+</body>
+</html>
